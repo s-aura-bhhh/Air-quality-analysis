@@ -1,0 +1,7 @@
+# Large Kaggle files: over GitHub's limits, download locally instead
+data/raw/city_hour.csv
+data/raw/station_hour.csv
+data/raw/station_day.csv
+data/interim/
+__pycache__/
+.ipynb_checkpoints/
