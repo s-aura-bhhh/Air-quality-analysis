@@ -1,0 +1,5 @@
+cluster,n_cities,cities,median_PM2.5,median_NO,median_NO2,median_CO,median_SO2,median_O3,PM2.5_winter/monsoon,share_good_sat,share_moderate,share_poor_plus
+0,5,"Kolkata, Gurugram, Lucknow, Patna, Delhi",85.71,15.72,32.14,1.12,10.0,32.16,4.02,0.21,0.27,0.52
+1,9,"Thiruvananthapuram, Coimbatore, Bengaluru, Amaravati, Chennai, Hyderabad, Amritsar, Visakhapatnam, Jaipur",38.48,8.1,21.11,0.78,8.18,30.71,2.23,0.57,0.37,0.06
+2,1,Ahmedabad,61.12,17.19,50.61,17.16,48.49,38.44,1.98,0.03,0.11,0.86
+3,4,"Guwahati, Jorapokhar, Brajrajnagar, Talcher",54.89,14.27,11.6,1.19,19.34,15.88,4.22,0.28,0.45,0.27
