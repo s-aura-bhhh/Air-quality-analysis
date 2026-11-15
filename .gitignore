@@ -5,3 +5,6 @@ data/raw/station_day.csv
 data/interim/
 __pycache__/
 .ipynb_checkpoints/
+report/*.aux
+report/*.log
+report/*.out

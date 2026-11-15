@@ -14,7 +14,7 @@ Air pollution is one of India's largest public-health risks, and monitoring stat
 
 ## 2. Data
 
-**Source.** Kaggle, "Air Quality Data in India (2015–2020)", compiled from the Central Pollution Control Board (CPCB) portal. File used: `city_day.csv`. Download date: **[TEAM]**.
+**Source.** Kaggle, "Air Quality Data in India (2015–2020)", compiled from the Central Pollution Control Board (CPCB) portal. File used: `city_day.csv`. 
 
 **Size.** 29,531 rows (city-days), 26 cities, 1 Jan 2015 – 1 Jul 2020. Columns: City, Date, 12 pollutants (PM2.5, PM10, NO, NO2, NOx, NH3, CO, SO2, O3, Benzene, Toluene, Xylene; all in µg/m³ except CO in mg/m³), AQI and AQI_Bucket.
 

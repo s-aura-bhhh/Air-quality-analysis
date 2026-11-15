@@ -1,13 +1,12 @@
 # Air Quality in Indian Cities: Prediction and Profiling
 
-MA515 (FDS) group project. Report draft: [`report/report.md`](report/report.md).
+MA515 (FDS) group project. Final report: [`report/main.pdf`](report/main.pdf) (LaTeX source `report/main.tex`). Longer draft with extra detail: [`report/report.md`](report/report.md).
 
 ## Data
 
 - Source: Kaggle, "Air Quality Data in India (2015-2020)" (Vopani / Rohan Rao), compiled from the CPCB (Central Pollution Control Board) portal.
 - Used: `data/raw/city_day.csv` (committed, 29,531 rows, 26 cities, 2015-01-01 to 2020-07-01).
 - Not committed (size): `city_hour.csv`, `station_day.csv`, `station_hour.csv`, `stations.csv`.
-- Download date: TODO.
 
 ## Layout
 
@@ -43,4 +42,4 @@ pip install -r requirements.txt
 jupyter notebook notebooks/
 ```
 
-Run the notebooks in order 02 to 07. Steps 04-07 import `src/aq.py`. In Google Colab, the first cell of notebooks 04-07 clones this repository; this works only if the repository is public.
+Run the notebooks in order 02 to 07. Steps 04-07 import `src/aq.py`. In Google Colab, the first cell of notebooks 04-07 clones this repository; the repository is public, so this works directly.
