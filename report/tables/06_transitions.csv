@@ -1,0 +1,13 @@
+case,model,days,share_predicted_unhealthy
+end of episode (1 -> 0),LogReg,309.0,0.909
+end of episode (1 -> 0),Persistence,309.0,1.0
+end of episode (1 -> 0),RF,309.0,0.964
+end of episode (1 -> 0),"Today's AQI, tuned threshold",309.0,1.0
+persistent (1 -> 1),LogReg,1498.0,0.997
+persistent (1 -> 1),Persistence,1498.0,1.0
+persistent (1 -> 1),RF,1498.0,0.999
+persistent (1 -> 1),"Today's AQI, tuned threshold",1498.0,1.0
+transition (0 -> 1),LogReg,297.0,0.805
+transition (0 -> 1),Persistence,297.0,0.0
+transition (0 -> 1),RF,297.0,0.747
+transition (0 -> 1),"Today's AQI, tuned threshold",297.0,0.707

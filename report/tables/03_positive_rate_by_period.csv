@@ -1,0 +1,4 @@
+period,days,positive_rate
+test 2020,2980,0.124
+train 2015-18,13131,0.335
+val 2019,5921,0.246

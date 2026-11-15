@@ -1,0 +1,5 @@
+period,rows,positive_rate
+train,13141.0,0.336
+val,5921.0,0.245
+test,2963.0,0.122
+test (no lockdown),1473.0,0.21

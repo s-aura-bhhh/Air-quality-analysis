@@ -1,0 +1,12 @@
+,skew_raw,skew_log1p,log_applied
+PM2.5,2.94,0.08,True
+PM10,1.71,-0.92,True
+NO,3.48,0.51,True
+NO2,2.25,-0.33,True
+NOx,2.37,-0.85,True
+NH3,3.79,-0.11,True
+CO,8.17,2.13,True
+SO2,3.87,0.78,True
+O3,1.48,-0.69,True
+Benzene,22.79,0.98,True
+Toluene,6.25,0.5,True
