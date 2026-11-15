@@ -33,7 +33,7 @@
 
 %=============================================================
 \section{Introduction}
-Air pollution is a serious health problem in India, and many Indian cities regularly appear among the most polluted in the world. The Central Pollution Control Board (CPCB) has monitoring stations in many cities that record pollutant levels every day. These readings are combined into a single number called the Air Quality Index (AQI). When the AQI goes above 200 (the ``Poor'' category or worse), it is considered harmful and health advisories are issued.
+Air pollution is a serious health problem in India, and many Indian cities regularly appear among the most polluted in the world. The Central Pollution Control Board (CPCB) has monitoring stations in many cities that record pollutant levels every day. These readings are combined into a single number called the Air Quality Index (AQI). When the AQI goes above 200 (the ``Poor'' category or worse), it is considered harmful and health advisories are issued. If such days could be predicted a day in advance, people could be warned and authorities could act (for example by restricting traffic or construction) before the air gets bad.
 
 We wanted to use this data to answer three questions:
 \begin{itemize}
@@ -43,15 +43,15 @@ We wanted to use this data to answer three questions:
 \end{itemize}
 %=============================================================
 \section{Dataset}
-We used the Kaggle dataset \emph{Air Quality Data in India (2015--2020)} by R.~Rao, which was collected from the CPCB website. We used the file \texttt{city\_day.csv}, which has one row per city per day: 29{,}531 rows covering 26 cities from 1 January 2015 to 1 July 2020.
+We used the Kaggle dataset \emph{Air Quality Data in India (2015--2020)} by R.~Rao, which was collected from the CPCB website. We used the file \texttt{city\_day.csv}, which has one row per city per day: 29{,}531 rows covering 26 cities from 1 January 2015 to 1 July 2020. We chose the city-level daily file over the hourly and station-level files because our questions are about cities and days.
 
 Each row has the city, the date, 12 pollutants, the AQI and the AQI category (AQI\_Bucket). The pollutants are PM2.5, PM10, NO, NO$_2$, NO$_x$, NH$_3$, CO, SO$_2$, O$_3$, Benzene, Toluene and Xylene. All are in $\mu$g/m$^3$ except CO, which is in mg/m$^3$. The AQI categories are Good (0--50), Satisfactory (51--100), Moderate (101--200), Poor (201--300), Very Poor (301--400) and Severe (above 400).
 
-Our code is organised as one Jupyter notebook per step (\nb{}{02} to \nb{}{07}). Shared code (loading, splitting, imputation) is in \href{\repo/blob/main/src/aq.py}{\texttt{\color{blue!60!black}src/aq.py}} and each section heading below links to its notebook.
+The code is one notebook per step (\nb{}{02} to \nb{}{07}) plus shared functions in \href{\repo/blob/main/src/aq.py}{\texttt{\color{blue!60!black}src/aq.py}}; each section heading links to its notebook.
 
 %=============================================================
 \section{Data cleaning \quad {\small(\nb{02_data_cleaning.ipynb}{02\_data\_cleaning})}}
-The first thing we noticed was the amount of missing data. Xylene is missing in 61.3\% of rows, PM10 in 37.7\%, NH$_3$ in 35.0\%, Toluene in 27.2\%, Benzene in 19.0\% and the AQI itself in 15.9\%. Part of this is because some cities never measured certain pollutants at all; Lucknow, for example, has no PM10 readings. Cities also started reporting at different times (from 2015 up to March 2020).
+The first thing we noticed was the amount of missing data. Xylene is missing in 61.3\% of rows, PM10 in 37.7\%, NH$_3$ in 35.0\%, Toluene in 27.2\%, Benzene in 19.0\% and the AQI itself in 15.9\%. Part of this is because some cities never measured certain pollutants at all; Lucknow, for example, has no PM10 readings (see the missing-value heatmap in the notebook). Cities also started reporting at different times (from 2015 up to March 2020).
 
 We found no duplicate (city, date) rows and no negative values. Within each city the dates are continuous, with no gaps. The AQI and AQI\_Bucket columns are missing on exactly the same 4{,}681 rows and always agree with each other, so we could not fill one from the other.
 
@@ -74,12 +74,25 @@ We measured skewness with the sample skewness $g_1$. For relationships between p
 g_1=\frac{\tfrac1n\sum_{i}(x_i-\bar x)^3}{s^3},\qquad
 \rho_S=1-\frac{6\sum_i d_i^2}{n(n^2-1)},\quad d_i=\operatorname{rank}(x_i)-\operatorname{rank}(y_i).
 \end{equation}
-Table~\ref{tab:eda} lists what we found and how each finding affected the modelling.
+Table~\ref{tab:stats} gives summary statistics after cleaning (25 cities). Every variable has mean greater than median and large positive skewness, i.e.\ it is right-skewed. After $\log(1+x)$ the skewness of PM2.5 drops from 3.34 to 0.06, which is why we use a log transform later. Table~\ref{tab:eda} lists the other findings and how each one affected the modelling.
+
+\begin{table}[!htb]\centering\footnotesize\setlength{\tabcolsep}{5pt}
+\begin{tabular}{lrrrrrrrr}\toprule
+Variable & $n$ & Mean & Median & Std & Min & Max & Skewness & Skewness of $\log(1+x)$\\\midrule
+PM2.5 ($\mu$g/m$^3$) & 24{,}149 & 68.5 & 49.2 & 65.3 & 0.04 & 950.0 & 3.34 & 0.06\\
+PM10 ($\mu$g/m$^3$) & 17{,}628 & 119.1 & 96.3 & 91.7 & 0.01 & 1000.0 & 2.04 & $-0.58$\\
+NO$_2$ ($\mu$g/m$^3$) & 25{,}190 & 28.7 & 21.7 & 24.7 & 0.01 & 362.2 & 2.46 & $-0.39$\\
+CO (mg/m$^3$) & 25{,}488 & 2.4 & 0.9 & 7.2 & 0.00 & 175.8 & 8.57 & 2.55\\
+SO$_2$ ($\mu$g/m$^3$) & 24{,}888 & 14.5 & 9.0 & 18.3 & 0.01 & 187.0 & 4.03 & 0.68\\
+O$_3$ ($\mu$g/m$^3$) & 24{,}712 & 34.5 & 30.9 & 21.8 & 0.01 & 257.7 & 1.33 & $-1.01$\\
+AQI & 24{,}075 & 168.4 & 119.0 & 142.3 & 13 & 2049 & 3.36 & 0.36\\\bottomrule
+\end{tabular}
+\caption{Summary statistics for the main variables (other pollutants are in the notebook).}\label{tab:stats}
+\end{table}
 
 \begin{table}[!htb]\centering\small
 \begin{tabular}{>{\raggedright\arraybackslash}p{3.4cm}>{\raggedright\arraybackslash}p{8.6cm}>{\raggedright\arraybackslash}p{3.6cm}}\toprule
 What we saw & Numbers & What we did\\\midrule
-Data is right-skewed & skewness of PM2.5 drops from 3.34 to 0.06 after $\log(1+x)$; Benzene from 20.5 to 1.2 & log transform\\
 Pollutants are correlated in groups & $\rho$(PM2.5, PM10) = 0.88, $\rho$(Benzene, Toluene) = 0.77, $\rho$(NO, NO$_x$) = 0.74, $\rho$(AQI, PM10) = 0.87 & PCR, PCA, VIF check\\
 Classes are imbalanced and change over time & 26.7\% of days are Poor or worse; 33.5\% in 2015--18, 24.6\% in 2019, 12.4\% in 2020 & ROC-AUC, PR-AUC, $F_2$ instead of accuracy\\
 Strong seasonal pattern & average AQI is 252 in Nov and 241 in Jan but 115 in Jul; day of the week changes it by only about 4 & month as a feature\\
@@ -87,7 +100,7 @@ COVID lockdown & Mar--May 2020 vs the same months of 2019: AQI $-29\%$, PM2.5 $-
 AQI changes slowly from day to day & if today is unhealthy, tomorrow is unhealthy 88\% of the time (only 6\% if today is fine) & lag features, baselines\\
 Number of cities grows over time & 7 cities in 2015, 26 in 2020 & compare trends within cities\\\bottomrule
 \end{tabular}
-\caption{Main findings from the EDA.}\label{tab:eda}
+\caption{Main findings from the EDA. Distribution plots, per-city boxplots and autocorrelation plots are in the notebook.}\label{tab:eda}
 \end{table}
 
 The lockdown gave us a natural experiment. NO$_2$, which comes mainly from vehicles, dropped the most. O$_3$ actually increased, probably because there was less NO in the air to react with and remove ozone. Since the weather also differed between the two years, this does not prove cause and effect.
@@ -115,8 +128,7 @@ We used the log only where it reduced the skewness on the training set, which tu
 \item \emph{SVD imputation}: fill the missing cells with 0 to start with, then repeatedly approximate the data matrix by a rank-$r$ matrix and replace only the missing cells, until the values stop changing:
 \begin{equation}
 Z=U\Sigma V^\top,\qquad \hat Z=U_r\Sigma_rV_r^\top,\qquad Z_{\text{missing}}\leftarrow \hat Z_{\text{missing}}.
-\end{equation}
-For validation and test rows we keep $V_r$ from training. We find the coefficients $c$ that best fit the row's observed values (a small ridge regression, $\min_c\|z_{\text{obs}}-V_{r,\text{obs}}\,c\|^2+\lambda\|c\|^2$) and use them to predict the missing values.
+\end{equation} For validation and test rows we reuse $V_r$ from training.
 \item \emph{City-adjusted} KNN and SVD: subtract each city's median first, run KNN or SVD on what is left, then add the median back.
 \end{itemize}
 To compare the methods fairly, we hid 10\% of the values that we actually knew in the validation set, filled them with each method, and computed the RMSE between the filled and true values. A score of 1.0 means no better than filling with the average.
@@ -162,7 +174,7 @@ I_p=I_{lo}+\frac{I_{hi}-I_{lo}}{B_{hi}-B_{lo}}\,(c_p-B_{lo}),\qquad \text{AQI}=\
 \end{equation}
 Taking a maximum makes the AQI a non-linear function of the pollutants. This explains why the random forest did best, with 17\% lower RMSE than linear regression.
 
-Multicollinearity turned out to be weaker than we expected: all VIF values were below 2.7. One reason is that many PM10 values are imputed, which weakens its link with PM2.5. Cross-validation chose 10 of the 11 components, and PCR performed almost the same as linear regression.
+Multicollinearity turned out to be weaker than we expected: all VIF values were below 2.7. One reason is that many PM10 values are imputed, which weakens its link with PM2.5. Cross-validation chose 10 of the 11 components, and PCR performed almost the same as linear regression. The residual vs fitted plot showed no clear pattern, but the QQ plot had heavy tails, so the p-values and confidence intervals from linear regression should be taken as approximate.
 
 For the important pollutants, the standardized regression coefficients were PM2.5 0.36, CO 0.27 and PM10 0.16, with every other pollutant below 0.05. The random forest's permutation importance gave the same order (0.66, 0.36, 0.13). When we removed Ahmedabad, the CO coefficient dropped by half (from 0.27 to 0.135). This means most of the CO effect comes from that one city's suspicious sensor.
 
@@ -186,7 +198,7 @@ We also tried a decision tree (splitting on Gini impurity $1-\sum_c p_c^2$), a r
 \begin{equation}
 \text{AUC}=P\big(\text{score of a random positive}>\text{score of a random negative}\big),\qquad F_\beta=\frac{(1+\beta^2)\,P\,R}{\beta^2P+R},\ \ \beta=2,
 \end{equation}
-where $P$ is precision and $R$ is recall.
+where $P$ is precision and $R$ is recall. The confusion matrices for all models are in the notebook.
 
 \begin{table}[!htb]\centering\footnotesize\setlength{\tabcolsep}{3.8pt}
 \begin{tabular}{lccccc|lccccc}\toprule
@@ -201,7 +213,7 @@ Logistic regression & 0.975 & 0.876 & 0.594 & 0.934 & 0.838 & KNN ($k=61$) & 0.9
 \end{table}
 
 \begin{figure}[!htb]\centering
-\includegraphics[width=0.6\textwidth]{figures/06_roc_pr.png}
+\includegraphics[width=0.56\textwidth]{figures/06_roc_pr.png}
 \caption{ROC curves (left) and precision--recall curves (right) on the test set. The dashed line uses only today's AQI.}
 \end{figure}
 
@@ -252,32 +264,31 @@ The clusters make sense geographically. The first cluster contains the big citie
 To check that the clusters are stable, we resampled the days 50 times (bootstrap) and repeated the clustering. The average ARI with our original clusters was 0.96, with a minimum of 0.51. Using $K=3$ or $K=5$ instead gave ARI 0.75 and 0.80. Without Ahmedabad the ARI was 0.68, but the Indo-Gangetic cluster stayed the same.
 
 %=============================================================
-\section{Answers to the research questions}
+\section{Limitations and future work}
+Imputation is not very accurate (error about 0.73 standard deviations), and pollutants a city never measured are filled entirely from other cities. Not all cities could be used (8 left out of the models, 6 out of the clustering). We had no weather data, although wind, rain and temperature strongly affect daily pollution. The 2020 test year is unusual because of the lockdown, and the share of unhealthy days halved, which lowers precision. Some sensors look unreliable (Ahmedabad's CO, exact zeros, Talcher's O$_3$), and with only 19 cities the clusters are a rough grouping. There are also possible sources of bias: a city's readings come from a few stations that may not represent the whole city, the cities with the longest records are mostly large northern ones so the models are fitted mainly to them, and median-based imputation pulls missing values towards typical levels. In future, the work could add weather data, try time-series models or gradient boosting, forecast 2--3 days ahead and build station-level models.
+
+%=============================================================
+\section{What we learned}
+\begin{itemize}
+\item Split by time first and fit everything on the training set only, otherwise there is data leakage.
+\item A good score means little without a fair baseline. Without tuning the AQI rule's threshold too, we would have overstated our improvement.
+\item It is important to understand how the target is calculated. Since the AQI is a maximum of sub-indices, finding which pollutant gives the maximum told us more than the $R^2$.
+\item Multicollinearity mostly affects how we interpret coefficients, not prediction; and PCA is just the SVD of the centered data, an idea that also works for imputation.
+\item Unusual values should be checked before modelling. One bad sensor (Ahmedabad's CO) doubled a coefficient and formed its own cluster.
+\end{itemize}
+
+\section{Conclusions: answers to the research questions}
 \textbf{RQ1.} PM2.5 is the main driver of the AQI, especially in winter; CO looks important only because of Ahmedabad. Same-day AQI is predicted with $R^2=0.89$ (partly circular) and tomorrow's AQI with $R^2=0.82$.
 
 \textbf{RQ2.} Yes, with ROC-AUC 0.976 and recall 0.92 (random forest). But the simple rule ``today's AQI $\ge160$'' already gives AUC 0.963, so the models add a small improvement, mainly when pollution is rising.
 
 \textbf{RQ3.} Yes, four fairly stable groups, explained by about three factors (overall level, traffic gases vs particulates, industrial pollution). This agrees with RQ1 (PC1 is driven by PM) and RQ2 (most unhealthy days are in the Indo-Gangetic cluster), so these cities from October to February should be the first priority.
 
-%=============================================================
-\section{Limitations and future work}
-Imputation is not very accurate (error about 0.73 standard deviations), and pollutants a city never measured are filled entirely from other cities. Not all cities could be used (8 left out of the models, 6 out of the clustering). We had no weather data, although wind, rain and temperature strongly affect daily pollution. The 2020 test year is unusual because of the lockdown, and the share of unhealthy days halved, which lowers precision. Some sensors look unreliable (Ahmedabad's CO, exact zeros, Talcher's O$_3$), and with only 19 cities the clusters are a rough grouping. In future, the work could add weather data, try time-series models or gradient boosting, forecast 2--3 days ahead and build station-level models.
+Overall, PM2.5 is the main cause of unhealthy air, worst in the Indo-Gangetic Plain in winter; next-day warnings are possible with simple models, and cities form a few stable groups that mostly follow geography.
 
 %=============================================================
-\section{What we learned}
-\begin{itemize}
-\item Split by time first and fit everything on the training set only, otherwise there is data leakage.
-\item A good score means little without a fair baseline. Without tuning the AQI rule's threshold too, we would have overstated our models' improvement. Accuracy was useless with imbalanced classes.
-\item It is important to understand how the target is calculated. Since the AQI is a maximum of sub-indices, finding which pollutant gives the maximum told us more than the $R^2$.
-\item Multicollinearity mostly affects how we interpret the coefficients, not how well the model predicts.
-\item PCA is the same as the SVD of the centered data matrix, and the same low-rank idea can fill in missing values.
-\item Unusual values should be checked before modelling. One bad sensor (Ahmedabad's CO) doubled a coefficient and formed its own cluster.
-\end{itemize}
 
-\section{Conclusion}
-Fine particulate matter (PM2.5) is the main cause of unhealthy air in Indian cities, and it is worst in the Indo-Gangetic Plain during winter. Next-day warnings are possible with simple, interpretable models, though a simple AQI rule already does most of the work. Cities fall into a few stable groups that mostly match their geography.
-
-\begin{center}\small
+{\centering\small
 \begin{tabular}{lll}\toprule
 Member & Role & Contribution\\\midrule
 Arahana Garg (2024MCB1261) & Data cleaning, EDA & Steps 1--3, notebooks 02--03\\
@@ -285,15 +296,14 @@ Kushagra Gupta (2024MCB1299) & Regression, PCR, PCA/SVD & Step 5, imputation (St
 Saurabh Sharma (2024MCB1311) & Classification, ROC analysis & Step 6, feature engineering\\
 Manish Kumar Chatakunda (2024MCB1302) & Clustering, report & Step 7, report and documentation\\\bottomrule
 \end{tabular}
-\captionof{table}{Contribution of each member.}
-\end{center}
+\captionof{table}{Contribution of each member.}\par}
 
 % If the course requires it, acknowledge AI assistance here, e.g.:
 % \textbf{Acknowledgement.} We used an AI assistant for help with code and writing; all analysis choices and results were checked by us.
 
-{\small\textbf{References.}
+{\footnotesize\textbf{References.}
 [1]~R.~Rao, \emph{Air Quality Data in India (2015--2020)}, Kaggle.
 [2]~CPCB, \emph{National Air Quality Index}, 2014.
-[3]~Hastie, Tibshirani, Friedman, \emph{The Elements of Statistical Learning}, 2nd ed., Springer, 2009.
-[4]~Pedregosa et al., Scikit-learn: Machine Learning in Python, \emph{JMLR} 12, 2011.}
+[3]~Hastie, Tibshirani, Friedman, \emph{The Elements of Statistical Learning}, Springer, 2009.
+[4]~Pedregosa et al., Scikit-learn, \emph{JMLR} 12, 2011.}
 \end{document}
