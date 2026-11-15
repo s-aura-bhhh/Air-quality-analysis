@@ -106,8 +106,8 @@ Number of cities grows over time & 7 cities in 2015, 26 in 2020 & compare trends
 The lockdown gave us a natural experiment. NO$_2$, which comes mainly from vehicles, dropped the most. O$_3$ actually increased, probably because there was less NO in the air to react with and remove ozone. Since the weather also differed between the two years, this does not prove cause and effect.
 
 \begin{figure}[!htb]\centering
-\begin{subfigure}{0.43\textwidth}\includegraphics[width=\linewidth]{figures/03_aqi_monthly_by_year.png}\end{subfigure}\hfill
-\begin{subfigure}{0.32\textwidth}\includegraphics[width=\linewidth]{figures/03_corr_heatmap.png}\end{subfigure}
+\begin{subfigure}{0.53\textwidth}\includegraphics[width=\linewidth]{figures/03_aqi_monthly_by_year.png}\end{subfigure}\hfill
+\begin{subfigure}{0.45\textwidth}\includegraphics[width=\linewidth]{figures/03_corr_heatmap.png}\end{subfigure}
 \caption{Left: monthly average AQI for each year. AQI is high in winter and low in the monsoon, and the 2020 lockdown dip is clearly visible. Right: Spearman correlation heatmap, which shows groups of correlated pollutants.}
 \end{figure}
 
@@ -213,7 +213,7 @@ Logistic regression & 0.975 & 0.876 & 0.594 & 0.934 & 0.838 & KNN ($k=61$) & 0.9
 \end{table}
 
 \begin{figure}[!htb]\centering
-\includegraphics[width=0.56\textwidth]{figures/06_roc_pr.png}
+\includegraphics[width=0.85\textwidth]{figures/06_roc_pr.png}
 \caption{ROC curves (left) and precision--recall curves (right) on the test set. The dashed line uses only today's AQI.}
 \end{figure}
 
@@ -247,17 +247,20 @@ J=\sum_{k=1}^{K}\sum_{i\in C_k}\|x_i-\mu_k\|^2,\qquad s_i=\frac{b_i-a_i}{\max(a_
 The silhouette score was highest at $K=4$ (0.38). As a second method we used hierarchical clustering with Ward linkage and looked at the dendrogram. The two methods agreed well, with an adjusted Rand index (ARI) of 0.83.
 
 \begin{figure}[!htb]\centering
-\begin{minipage}{0.38\textwidth}\includegraphics[width=\linewidth]{figures/07_biplot.png}\end{minipage}\hfill
-\begin{minipage}{0.52\textwidth}\footnotesize\setlength{\tabcolsep}{3pt}
-\begin{tabular}{>{\raggedright\arraybackslash}p{4.0cm}>{\raggedright\arraybackslash}p{4.3cm}}\toprule
+\includegraphics[width=0.78\textwidth]{figures/07_biplot.png}
+\caption{PCA biplot of the 19 cities on the first two principal components. Arrows show the loadings of the 10 strongest features.}
+\end{figure}
+
+\begin{table}[!htb]\centering\small
+\begin{tabular}{>{\raggedright\arraybackslash}p{6.5cm}>{\raggedright\arraybackslash}p{9.0cm}}\toprule
 Cluster & What it looks like\\\midrule
 Delhi, Gurugram, Lucknow, Patna, Kolkata & PM2.5 86 $\mu$g/m$^3$, 52\% of days Poor or worse, winter PM2.5 about 4 times the monsoon level\\
 Chennai, Bengaluru, Hyderabad, Coimbatore, Jaipur and 4 others & PM2.5 38, only 6\% of days Poor or worse\\
 Talcher, Brajrajnagar, Jorapokhar, Guwahati & low NO$_2$ and O$_3$, PM2.5 55, strong winter peak (4.2 times)\\
 Ahmedabad alone & CO 17 mg/m$^3$, SO$_2$ 48, 86\% of days Poor or worse\\\bottomrule
-\end{tabular}\end{minipage}
-\caption{PCA biplot of the 19 cities (left) and a description of the four k-means clusters (right).}
-\end{figure}
+\end{tabular}
+\caption{The four k-means clusters ($K=4$).}
+\end{table}
 
 The clusters make sense geographically. The first cluster contains the big cities of the Indo-Gangetic Plain. The third contains the coal and industrial towns of Odisha and Jharkhand. Exceptions are Amritsar and Jaipur (northern but in the cleaner group) and Guwahati (with the industrial towns because of its low NO$_2$ and O$_3$).
 
