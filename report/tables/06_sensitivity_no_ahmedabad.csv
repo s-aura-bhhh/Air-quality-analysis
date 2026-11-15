@@ -1,0 +1,5 @@
+model,set,ROC_AUC_no_Ahmedabad,ROC_AUC_all
+LogReg,val,0.983,0.986
+LogReg,test,0.975,0.975
+RF,val,0.983,0.986
+RF,test,0.976,0.976
